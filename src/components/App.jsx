@@ -5,26 +5,18 @@ import { Button } from './Button/Button';
 import { Loader } from './Loader/Loader';
 import { Modal } from './Modal/Modal';
 import css from './App.module.css';
+import { fetchImagesApi } from './Api/Api';
 
 export class App extends Component {
-  constructor(props) {
-    super(props);
-
-    this.state = {
-      searchQuery: '',
-      images: [],
-      page: 1,
-      isLoading: false,
-      showModal: false,
-      largeImageURL: '',
-      showBtn: false,
-    };
-  }
-
-  componentDidMount() {
-    const { searchQuery, page } = this.state;
-    this.fetchImages(searchQuery, page);
-  }
+  state = {
+    searchQuery: '',
+    images: [],
+    page: 1,
+    isLoading: false,
+    showModal: false,
+    largeImageURL: '',
+    showBtn: false,
+  };
 
   componentDidUpdate(prevProps, prevState) {
     const { searchQuery, page } = this.state;
@@ -34,16 +26,9 @@ export class App extends Component {
   }
 
   fetchImages = async (searchQuery, page) => {
-    if (!searchQuery) return;
-
     try {
       this.setState({ isLoading: true });
-
-      const response = await fetch(
-        `https://pixabay.com/api/?q=${searchQuery}&page=${page}&key=40756450-2b62d5efbb9c5d98f0ec642a2&image_type=photo&orientation=horizontal&per_page=12`
-      );
-      const data = await response.json();
-
+      const data = await fetchImagesApi(searchQuery, page);
       this.setState(prevState => ({
         images: [...prevState.images, ...data.hits],
         showBtn: page < Math.ceil(data.totalHits / 12),
